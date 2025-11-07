@@ -13,6 +13,11 @@
   <header class="container">
     <h1> Audio Recap | Viet & Anh <span class="badge">VI/EN</span></h1>
     <p class="sub">Created by : MaX Phan</p>
+    <nav class="nav-links">
+      <a href="{{ url_for('index') }}">🏠 Trang chủ</a>
+      <a href="{{ url_for('recap_storage') }}">📦 Recap Storage</a>
+    </nav>
+
   </header>
   <main class="container">
     {% block content %}{% endblock %}

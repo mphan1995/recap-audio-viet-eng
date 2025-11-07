@@ -42,7 +42,6 @@ def _select_device(device_pref: str):
     if device_pref == "cuda":
         return "cuda"
     try:
-        import torch
         return "cuda" if torch.cuda.is_available() else "cpu"
     except Exception:
         return "cpu"
@@ -95,7 +94,6 @@ def auto_select_params(file_size_mb: float, duration_hint: float = 0):
 @app.post("/api/transcribe")
 def api_transcribe():
     try:
-        import time
         t0 = time.time()
         file = request.files.get("audio")
         if not file:
@@ -184,6 +182,29 @@ def api_transcribe():
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
 
+# Recap-Storage & Export
+@app.route("/api/recaps")
+def list_recaps():
+    return jsonify([
+        {"id": "recap1", "filename": "meeting01", "date": "2025-11-07", "duration": "12m", "summary": "Cuộc họp marketing ..."},
+        {"id": "recap2", "filename": "interview02", "date": "2025-11-06", "duration": "8m", "summary": "Phỏng vấn khách hàng ..."}
+    ])
+
+@app.route("/api/recap/<recap_id>")
+def get_recap(recap_id):
+    # Thay bằng NoSQL lookup
+    return jsonify({
+        "id": recap_id,
+        "filename": f"{recap_id}.wav",
+        "summary": "Cuộc họp về kế hoạch marketing Q4.",
+        "transcript": "Speaker 1: Xin chào, hôm nay ta bàn về chiến dịch quảng cáo..."
+    })
+
+@app.route("/recap-storage")
+def recap_storage():
+    return render_template("recap-storage.html")
+
+#Export Recap
 @app.get("/api/export/<fmt>")
 def export_recap(fmt):
     """
@@ -191,6 +212,8 @@ def export_recap(fmt):
     """
     # Lấy recap JSON mới nhất trong storage
     storage = os.path.join("storage")
+    if not os.path.exists(storage):
+        os.makedirs(storage, exist_ok=True)
     recap_files = sorted(
         [f for f in os.listdir(storage) if f.startswith("recap_") and f.endswith(".json")],
         reverse=True,
@@ -199,7 +222,6 @@ def export_recap(fmt):
         return jsonify({"ok": False, "error": "Không tìm thấy file recap"}), 404
 
     latest = os.path.join(storage, recap_files[0])
-    import json
     with open(latest, encoding="utf-8") as f:
         data = json.load(f)
 
@@ -218,21 +240,18 @@ def export_recap(fmt):
 
     elif fmt == "excel":
         output = BytesIO()
-        with pd.ExcelWriter(output, engine="openpyxl") as writer:
-            df.to_excel(writer, sheet_name="Segments", index=False)
-            summary_sheet = pd.DataFrame({"Summary": [summary]})
-            summary_sheet.to_excel(writer, sheet_name="Summary", index=False)
-
-            ws = writer.sheets["Segments"]
-            for col in ws.columns:
-                max_len = max(len(str(c.value or "")) for c in col)
-                ws.column_dimensions[col[0].column_letter].width = max(12, max_len)
-            ws["A1"].font = ws["B1"].font = ws["C1"].font = ws["D1"].font = ws["E1"].font.copy(bold=True)
+        writer = pd.ExcelWriter(output, engine="openpyxl")
+        df.to_excel(writer, sheet_name="Segments", index=False)
+        pd.DataFrame({"Summary": [summary]}).to_excel(writer, sheet_name="Summary", index=False)
+        writer.close()   # ✅ đảm bảo flush
         output.seek(0)
-        return send_file(output,
-                         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                         as_attachment=True,
-                         download_name="recap.xlsx")
+        return send_file(
+            output,
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            as_attachment=True,
+            download_name="recap.xlsx"
+        )
+
 
     elif fmt == "word":
         doc = Document()

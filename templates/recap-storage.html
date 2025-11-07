@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Recap Storage</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f8f8f8; }
+    tr:hover { background-color: #f3f3f3; cursor: pointer; }
+    #recap-detail { margin-top: 30px; display: none; }
+    .export-btn { margin-right: 5px; }
+  </style>
+</head>
+<body>
+
+<h2>📦 Danh sách Recap đã lưu</h2>
+
+<table id="recap-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Ngày</th>
+      <th>Tên file</th>
+      <th>Thời lượng</th>
+      <th>Tóm tắt</th>
+    </tr>
+  </thead>
+  <tbody id="recap-body"></tbody>
+</table>
+
+<div id="recap-detail">
+  <h3>Chi tiết Recap</h3>
+  <pre id="recap-content"></pre>
+  <button class="export-btn" onclick="downloadRecap('csv')">📄 Export CSV</button>
+  <button class="export-btn" onclick="downloadRecap('xlsx')">📘 Export Excel</button>
+  <button class="export-btn" onclick="downloadRecap('docx')">📝 Export Word</button>
+</div>
+
+<script>
+let currentRecap = null;
+
+// 🧠 Load danh sách recap
+async function loadRecaps() {
+  const res = await fetch('/api/recaps');
+  const recaps = await res.json();
+  const tbody = document.getElementById('recap-body');
+  tbody.innerHTML = '';
+
+  recaps.forEach(r => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${r.id}</td>
+      <td>${r.date}</td>
+      <td>${r.filename}</td>
+      <td>${r.duration}</td>
+      <td>${r.summary.slice(0, 80)}...</td>`;
+    row.onclick = () => showRecapDetail(r.id);
+    tbody.appendChild(row);
+  });
+}
+
+// 📖 Hiển thị chi tiết recap
+async function showRecapDetail(id) {
+  const res = await fetch(`/api/recap/${id}`);
+  const data = await res.json();
+  currentRecap = data;
+
+  document.getElementById('recap-content').textContent =
+    `File: ${data.filename}\n\nSummary:\n${data.summary}\n\nTranscript:\n${data.transcript}`;
+  document.getElementById('recap-detail').style.display = 'block';
+}
+
+// 📤 Export recap ra định dạng
+async function downloadRecap(fmt) {
+  if (!currentRecap) return alert('Chưa chọn recap nào!');
+
+  // 🪄 Gửi data lên backend để export định dạng đẹp
+  const res = await fetch(`/api/export/${fmt}`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(currentRecap)
+  });
+
+  if (!res.ok) return alert('Lỗi export recap!');
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${currentRecap.filename}.${fmt}`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+loadRecaps();
+</script>
+</body>
+</html>
