@@ -1,0 +1,58 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.dll
+*.log
+*.sqlite3
+
+# ---- Virtual Environment ----
+.venv/
+venv/
+env/
+ENV/
+*.env
+.env.*
+
+# ---- Flask Cache & Config ----
+instance/
+*.db
+*.sqlite
+
+# ---- Project local storage ----
+storage/
+tmp/
+uploads/
+
+# ---- System & IDE files ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.bak
+
+# ---- Compiled / cache ----
+*.out
+*.class
+*.lock
+*.pid
+
+# ---- Node / Web static build (if any future JS bundler) ----
+node_modules/
+dist/
+build/
+
+# ---- Audio outputs ----
+*.wav
+*.mp3
+*.m4a
+*.flac
+
+# ---- Exported results ----
+*.csv
+*.xlsx
+*.docx
+*.pdf

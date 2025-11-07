@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MaX Phan - Recap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+  <header class="container">
+    <h1> Audio Recap | Viet & Anh <span class="badge">VI/EN</span></h1>
+    <p class="sub">Created by : MaX Phan</p>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="container foot">
+    <div class="footer-left">
+      <span>Device: <strong>{{ device }}</strong></span>
+    </div>
+    <div class="footer-right">
+      <span class="watermark">Created by <strong>MaX Phan</strong> — OFFICIALLY : <time datetime="2025-09-02">September&nbsp;2<sup>nd</sup>,&nbsp;2025</time></span>
+    </div>
+  </footer>
+  <script>
+    window.APP_DEFAULTS = {
+      model: "{{ default_model }}",
+      compute: "{{ default_compute }}",
+      summaryLang: "{{ default_summary_lang }}",
+    };
+  </script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

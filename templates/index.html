@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="recap-wrapper">
+
+  <!-- Upload + Config -->
+  <div class="upload-card glass">
+    <h2 class="title">🎧 Analyze and Recap Audio</h2>
+
+    <form id="uploadForm" class="config-grid">
+      <div class="file-select">
+        <input type="file" id="fileInput" name="audio" accept="audio/*" required>
+        <label for="fileInput" class="file-label">
+          <span id="fileLabelText">Choose your file (mp3/wav/m4a...)</span>
+        </label>
+        <button class="primary" type="submit">🚀 Let's Analyze</button>
+      </div>
+
+      <div class="settings">
+        <div>
+          <label>Model</label>
+          <select name="model" id="modelSelect"></select>
+        </div>
+        <div>
+          <label>Compute</label>
+          <select name="compute_type" id="computeSelect">
+            <option>int8_float16</option>
+            <option>int8</option>
+            <option>float16</option>
+            <option>float32</option>
+          </select>
+        </div>
+        <div>
+          <label>Beam size</label>
+          <input type="number" min="1" max="10" value="5" name="beam_size" />
+        </div>
+        <div>
+          <label>ASR language</label>
+          <select name="asr_lang">
+            <option value="auto">Auto</option>
+            <option value="vi">Tiếng Việt</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <div>
+          <label>Summary language</label>
+          <select name="lang" id="summaryLang">
+            <option value="auto">Auto</option>
+            <option value="vi">Tiếng Việt</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <!-- Progress -->
+    <div id="progress" class="progress hidden">
+      <div class="progress-bar"></div>
+      <span id="progressText">0%</span>
+    </div>
+    <div id="statusText" class="status-text"></div>
+  </div>
+
+  <!-- Player -->
+  <div class="player-container hidden" id="playerContainer">
+    <audio id="player" controls></audio>
+  </div>
+
+  <!-- Results -->
+  <div id="results" class="results hidden">
+    <div class="results-header">
+      <h3>📜 Kết quả phân tích</h3>
+      <div class="export-buttons">
+        <button onclick="downloadRecap('csv')">📄 CSV</button>
+        <button onclick="downloadRecap('excel')">📊 Excel</button>
+        <button onclick="downloadRecap('word')">📝 Word</button>
+      </div>
+    </div>
+
+    <div class="grid-two">
+      <div class="box">
+        <h3>🗣️ Transcript</h3>
+        <pre id="transcript"></pre>
+      </div>
+      <div class="box">
+        <h3>🧠 Summary</h3>
+        <pre id="summary"></pre>
+      </div>
+    </div>
+
+    <!-- Meta -->
+    <div class="meta">
+      <div class="pill" id="mdl"></div>
+      <div class="pill" id="dur"></div>
+      <div class="pill" id="snr"></div>
+      <div class="pill" id="lat"></div>
+      <div class="pill" id="detLang"></div>
+    </div>
+
+    <!-- Segments -->
+    <details class="segments-detail">
+      <summary>🎬 Chi tiết từng đoạn</summary>
+      <table id="segmentsTable">
+        <thead>
+          <tr>
+            <th>#</th><th>Bắt đầu</th><th>Kết thúc</th><th>Nội dung</th><th>Độ tin cậy</th><th>Nghe lại</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </details>
+  </div>
+</section>
+{% endblock %}
