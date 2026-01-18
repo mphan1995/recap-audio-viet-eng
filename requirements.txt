@@ -1,149 +1,58 @@
-aiohappyeyeballs
-aiohttp
-aiosignal
-alembic
-annotated-types
-anyio
-asteroid-filterbanks
-attrs
-audioread
-av
-blinker
-certifi
-cffi
-charset-normalizer
-click
-coloredlogs
-colorlog
-contourpy
-ctranslate2
-cycler
-decorator
-distro
-einops
-faster-whisper
-ffmpeg-python
-filelock
+# =========================
+# Core Backend
+# =========================
 Flask
-flatbuffers
-fonttools
-frozenlist
-fsspec
-future
-googleapis-common-protos
-greenlet
-grpcio
-h11
-hf-xet
-httpcore
-httpx
-huggingface_hub
-humanfriendly
-idna
-importlib_metadata
-itsdangerous
-Jinja2
-jiter
-joblib
-julius
-kiwisolver
-lazy_loader
-librosa
-lightning
-lightning-utilities
-llvmlite
-Mako
-markdown-it-py
-MarkupSafe
-matplotlib
-mdurl
-mpmath
-msgpack
-multidict
-networkx
-noisereduce
-numba
+Werkzeug
+python-dotenv
+click
+requests
+urllib3
+
+# =========================
+# Audio Processing
+# =========================
 numpy
-nvidia-cublas-cu12
-nvidia-cuda-cupti-cu12
-nvidia-cuda-nvrtc-cu12
-nvidia-cuda-runtime-cu12
-nvidia-cudnn-cu12
-nvidia-cufft-cu12
-nvidia-cufile-cu12
-nvidia-curand-cu12
-nvidia-cusolver-cu12
-nvidia-cusparse-cu12
-nvidia-cusparselt-cu12
-nvidia-nccl-cu12
-nvidia-nvjitlink-cu12
-nvidia-nvtx-cu12
-onnxruntime
-openai
-opentelemetry-api
-opentelemetry-exporter-otlp
-opentelemetry-exporter-otlp-proto-common
-opentelemetry-exporter-otlp-proto-grpc
-opentelemetry-exporter-otlp-proto-http
-opentelemetry-proto
-opentelemetry-sdk
-opentelemetry-semantic-conventions
-optuna
-packaging
-pandas
-pillow
-platformdirs
-pooch
-primePy
-propcache
-protobuf
+scipy
+librosa
+soundfile
+audioread
+ffmpeg-python
+soxr
+noisereduce
+
+# =========================
+# Speech-to-Text (ASR)
+# =========================
+torch
+torchaudio
+faster-whisper
+ctranslate2
+
+# =========================
+# Speaker Diarization
+# =========================
 pyannote-audio
 pyannote-core
-pyannote-database
-pyannote-metrics
 pyannote-pipeline
-pyannoteai-sdk
-pycparser
-pydantic
-pydantic_core
-pydub
-Pygments
-pyparsing
-python-dateutil
-python-dotenv
-pytorch-lightning
-pytorch-metric-learning
-pytz
-PyYAML
-requests
-rich
-safetensors
-scikit-learn
-scipy
-setuptools
-shellingham
-six
-sniffio
-sortedcontainers
-soundfile
-soxr
-SQLAlchemy
-sympy
-threadpoolctl
-tokenizers
-torch
-torch-audiomentations
-torch_pitch_shift
-torchaudio
-torchcodec
-torchmetrics
+
+# =========================
+# NLP / Summary
+# =========================
+openai
+tiktoken
+
+# =========================
+# Utilities / Visualization
+# =========================
 tqdm
-triton
-typer-slim
-typing-inspection
-typing_extensions
-tzdata
-urllib3
-Werkzeug
-yarl
-zipp
+rich
+pandas
+PyYAML
+
+# =========================
+# ML Utils (needed by deps)
+# =========================
+scikit-learn
+joblib
+numba
+llvmlite
