@@ -1,28 +1,27 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, render_template
 from dotenv import load_dotenv
-load_dotenv()
 
-from scripts.run_recap import run_recap
-import os
+from config.loader import get_setting, load_settings
+from routes.recap_routes import recap_bp
 
-app = Flask(__name__)
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+def create_app() -> Flask:
+    load_dotenv()
+    app = Flask(__name__)
 
-@app.route("/api/recap", methods=["POST"])
-def recap_api():
-    if "file" not in request.files:
-        return jsonify({"error":"No file uploaded"}), 400
+    settings = load_settings()
+    max_upload_mb = int(get_setting(settings, ["server", "max_upload_mb"], 200))
+    app.config["MAX_CONTENT_LENGTH"] = max_upload_mb * 1024 * 1024
 
-    file = request.files["file"]
-    os.makedirs("data/input", exist_ok=True)
-    input_path = os.path.join("data/input", file.filename)
-    file.save(input_path)
+    app.register_blueprint(recap_bp)
 
-    result = run_recap(input_path)
-    return jsonify(result)
+    @app.route("/")
+    def index():
+        return render_template("index.html")
+
+    return app
+
 
 if __name__ == "__main__":
+    app = create_app()
     app.run(host="127.0.0.1", port=5000, debug=True)
