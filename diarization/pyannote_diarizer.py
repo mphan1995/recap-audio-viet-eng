@@ -1,16 +1,27 @@
 from typing import List, Optional
 
-from pyannote.audio import Pipeline
+try:
+    import torch
+except ImportError:  # pragma: no cover
+    torch = None
 
 
 class PyannoteDiarizer:
-    def __init__(self, hf_token: Optional[str]) -> None:
+    def __init__(self, hf_token: Optional[str], device: str = "auto") -> None:
         if not hf_token:
             raise ValueError("HF_TOKEN is required for diarization.")
+
+        Pipeline = _load_pipeline()
         self.pipeline = Pipeline.from_pretrained(
             "pyannote/speaker-diarization",
             use_auth_token=hf_token,
         )
+        resolved_device = _resolve_device(device)
+        if torch and resolved_device:
+            try:
+                self.pipeline.to(torch.device(resolved_device))
+            except Exception:
+                pass
 
     def run(
         self,
@@ -36,3 +47,22 @@ class PyannoteDiarizer:
 
         speakers.sort(key=lambda item: item["start"])
         return speakers
+
+
+def _load_pipeline():
+    try:
+        from pyannote.audio import Pipeline
+    except Exception as exc:  # pragma: no cover
+        raise RuntimeError(
+            "Failed to import pyannote. Ensure torch/torchaudio versions match "
+            "your Python environment, or disable diarization."
+        ) from exc
+    return Pipeline
+
+
+def _resolve_device(device: str) -> Optional[str]:
+    if device and device != "auto":
+        return device
+    if torch and torch.cuda.is_available():
+        return "cuda"
+    return "cpu"
