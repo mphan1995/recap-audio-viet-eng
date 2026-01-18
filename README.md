@@ -6,16 +6,16 @@ AI system to recap conversation audio with ASR, diarization, and optional GPT su
 ```bash
 pip install -r requirements.txt
 sudo apt install ffmpeg
-export HF_TOKEN=xxx
-export OPENAI_API_KEY=xxx
-python web_app.py
+# edit .env with your keys
+python app.py serve
+# or simply: python app.py
 ```
 Open `http://127.0.0.1:5000`.
 
 ## CLI
 ```bash
-python app.py path/to/audio.wav --language vi
-python app.py path/to/audio.wav --no-gpt
+python app.py run path/to/audio.wav --language vi
+python app.py run path/to/audio.wav --no-gpt
 ```
 
 ## Project layout
@@ -37,3 +37,7 @@ Edit `config/settings.yaml` to tune ASR model, diarization limits, and server up
 
 ## Outputs
 Each request writes results into `data/jobs/<job_id>/result.json`.
+
+## Notes
+- The system auto-selects CPU/GPU (ASR + diarization) via `device: auto`.
+- If diarization fails with a `torchaudio` error, install a matching `torch`/`torchaudio` version for your Python environment.
