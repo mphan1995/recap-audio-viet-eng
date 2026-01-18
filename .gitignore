@@ -25,6 +25,7 @@ instance/
 storage/
 tmp/
 uploads/
+data/
 
 # ---- System & IDE files ----
 .DS_Store
