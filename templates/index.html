@@ -1,113 +1,130 @@
-{% extends 'base.html' %}
-{% block content %}
-<section class="recap-wrapper">
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>RECAP – AI Audio Recap</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
 
-  <!-- Upload + Config -->
-  <div class="upload-card glass">
-    <h2 class="title">🎧 Analyze and Recap Audio</h2>
-
-    <form id="uploadForm" class="config-grid">
-      <div class="file-select">
-        <input type="file" id="fileInput" name="audio" accept="audio/*" required>
-        <label for="fileInput" class="file-label">
-          <span id="fileLabelText">Choose your file (mp3/wav/m4a...)</span>
-        </label>
-        <button class="primary" type="submit">🚀 Let's Analyze</button>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">R</div>
+        <div class="brand-text">
+          <div class="title">RECAP</div>
+          <div class="sub">AI Recap for more intelligence</div>
+        </div>
       </div>
 
-      <div class="settings">
-        <div>
-          <label>Model</label>
-          <select name="model" id="modelSelect"></select>
-        </div>
-        <div>
-          <label>Compute</label>
-          <select name="compute_type" id="computeSelect">
-            <option>int8_float16</option>
-            <option>int8</option>
-            <option>float16</option>
-            <option>float32</option>
-          </select>
-        </div>
-        <div>
-          <label>Beam size</label>
-          <input type="number" min="1" max="10" value="5" name="beam_size" />
-        </div>
-        <div>
-          <label>ASR language</label>
-          <select name="asr_lang">
-            <option value="auto">Auto</option>
-            <option value="vi">Tiếng Việt</option>
-            <option value="en">English</option>
-          </select>
-        </div>
-        <div>
-          <label>Summary language</label>
-          <select name="lang" id="summaryLang">
-            <option value="auto">Auto</option>
-            <option value="vi">Tiếng Việt</option>
-            <option value="en">English</option>
-          </select>
-        </div>
+      <div class="top-actions">
+        <a class="ghost" href="#" id="btnDownloadJson" title="Download JSON" aria-disabled="true">Download</a>
+        <button class="ghost" id="btnClear">Clear</button>
       </div>
-    </form>
+    </header>
 
-    <!-- Progress -->
-    <div id="progress" class="progress hidden">
-      <div class="progress-bar"></div>
-      <span id="progressText">0%</span>
-    </div>
-    <div id="statusText" class="status-text"></div>
+    <main class="grid">
+      <!-- Left: Upload & Settings -->
+      <section class="card">
+        <h2 class="card-title">Input</h2>
+
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="audioFile" accept="audio/*" hidden />
+          <div class="dz-inner">
+            <div class="dz-icon">🎧</div>
+            <div class="dz-text">
+              <div class="dz-head">Kéo & thả audio vào đây</div>
+              <div class="dz-sub">hoặc <span class="dz-link" id="pickFile">chọn file</span> (mp3, wav, m4a...)</div>
+            </div>
+          </div>
+          <div class="dz-meta" id="fileMeta">Chưa có file.</div>
+        </div>
+
+        <div class="form">
+          <div class="row">
+            <label>Language</label>
+            <select id="language">
+              <option value="auto">Auto</option>
+              <option value="vi">Vietnamese</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label>Pipeline</label>
+            <div class="toggles">
+              <label class="toggle">
+                <input type="checkbox" id="diarization" checked />
+                <span>Speaker Diarization</span>
+              </label>
+              <label class="toggle">
+                <input type="checkbox" id="gpt" checked />
+                <span>GPT Analysis</span>
+              </label>
+            </div>
+          </div>
+
+          <button class="primary" id="startBtn">
+            <span class="dot"></span>
+            Start Recap
+          </button>
+
+          <div class="status" id="status">
+            <span class="badge neutral">Idle</span>
+            <span class="status-text">Sẵn sàng.</span>
+          </div>
+
+          <div class="progress hidden" id="progressWrap">
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="progress-hint" id="progressHint">Đang xử lý…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Results -->
+      <section class="card">
+        <div class="card-head">
+          <h2 class="card-title">Output</h2>
+
+          <div class="tabs" role="tablist">
+            <button class="tab active" data-tab="summary" role="tab">Summary</button>
+            <button class="tab" data-tab="transcript" role="tab">Transcript</button>
+            <button class="tab" data-tab="json" role="tab">JSON</button>
+          </div>
+        </div>
+
+        <div class="panel" id="panelEmpty">
+          <div class="empty">
+            <div class="empty-icon">✨</div>
+            <div class="empty-title">Chưa có kết quả</div>
+            <div class="empty-sub">Upload audio và bấm <b>Start Recap</b> để bắt đầu.</div>
+          </div>
+        </div>
+
+        <div class="panel hidden" id="panelResult">
+          <div class="tabview" id="view-summary">
+            <div class="summary" id="summary"></div>
+          </div>
+
+          <div class="tabview hidden" id="view-transcript">
+            <div class="transcript" id="transcript"></div>
+          </div>
+
+          <div class="tabview hidden" id="view-json">
+            <pre class="code" id="json"></pre>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Create and Work by MaX Phan</span>
+    </footer>
   </div>
 
-  <!-- Player -->
-  <div class="player-container hidden" id="playerContainer">
-    <audio id="player" controls></audio>
-  </div>
-
-  <!-- Results -->
-  <div id="results" class="results hidden">
-    <div class="results-header">
-      <h3>📜 Kết quả phân tích</h3>
-      <div class="export-buttons">
-        <button onclick="downloadRecap('csv')">📄 CSV</button>
-        <button onclick="downloadRecap('excel')">📊 Excel</button>
-        <button onclick="downloadRecap('word')">📝 Word</button>
-      </div>
-    </div>
-
-    <div class="grid-two">
-      <div class="box">
-        <h3>🗣️ Transcript</h3>
-        <pre id="transcript"></pre>
-      </div>
-      <div class="box">
-        <h3>🧠 Summary</h3>
-        <pre id="summary"></pre>
-      </div>
-    </div>
-
-    <!-- Meta -->
-    <div class="meta">
-      <div class="pill" id="mdl"></div>
-      <div class="pill" id="dur"></div>
-      <div class="pill" id="snr"></div>
-      <div class="pill" id="lat"></div>
-      <div class="pill" id="detLang"></div>
-    </div>
-
-    <!-- Segments -->
-    <details class="segments-detail">
-      <summary>🎬 Chi tiết từng đoạn</summary>
-      <table id="segmentsTable">
-        <thead>
-          <tr>
-            <th>#</th><th>Bắt đầu</th><th>Kết thúc</th><th>Nội dung</th><th>Độ tin cậy</th><th>Nghe lại</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </details>
-  </div>
-</section>
-{% endblock %}
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

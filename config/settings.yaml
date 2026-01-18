@@ -1,0 +1,18 @@
+audio:
+  sample_rate: 16000
+  mono: true
+
+asr:
+  model: medium
+  compute_type: int8
+  language: auto
+
+diarization:
+  min_speakers: 1
+  max_speakers: 5
+
+gender:
+  male_pitch_max: 165
+
+gpt:
+  model: gpt-4o-mini
