@@ -1,18 +1,28 @@
 audio:
   sample_rate: 16000
   mono: true
+  normalize: false
+  silence_threshold_db: -40.0
 
 asr:
   model: medium
+  device: cpu
   compute_type: int8
   language: auto
+  vad_filter: false
+  beam_size: 5
 
 diarization:
   min_speakers: 1
   max_speakers: 5
+  min_overlap_ratio: 0.2
 
 gender:
   male_pitch_max: 165
 
 gpt:
   model: gpt-4o-mini
+  temperature: 0.2
+
+server:
+  max_upload_mb: 200
