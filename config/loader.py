@@ -26,3 +26,15 @@ def get_setting(settings: Dict[str, Any], keys: Iterable[str], default: Any = No
             return default
         current = current[key]
     return current
+
+
+def merge_settings(base: Dict[str, Any], overrides: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    if not overrides:
+        return base
+    merged = dict(base)
+    for key, value in overrides.items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = merge_settings(merged[key], value)
+        else:
+            merged[key] = value
+    return merged

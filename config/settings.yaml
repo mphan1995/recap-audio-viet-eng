@@ -2,12 +2,16 @@ audio:
   sample_rate: 16000
   mono: true
   normalize: false
+  denoise: false
+  trim_silence: false
+  trim_db: 40.0
+  noise_duration_sec: 0.5
   silence_threshold_db: -40.0
 
 asr:
   model: medium
-  device: cpu
-  compute_type: int8
+  device: auto
+  compute_type: auto
   language: auto
   vad_filter: false
   beam_size: 5
@@ -16,6 +20,8 @@ diarization:
   min_speakers: 1
   max_speakers: 5
   min_overlap_ratio: 0.2
+  device: auto
+  allow_fallback: true
 
 gender:
   male_pitch_max: 165

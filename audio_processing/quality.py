@@ -17,6 +17,8 @@ def compute_audio_metrics(
             "peak_dbfs": 0.0,
             "silence_ratio": 1.0,
             "clip_ratio": 0.0,
+            "spectral_flatness_mean": 0.0,
+            "zcr_mean": 0.0,
         }
 
     duration_sec = float(librosa.get_duration(y=audio, sr=sr))
@@ -29,6 +31,8 @@ def compute_audio_metrics(
 
     silence_ratio = float(np.mean(rms_db < silence_threshold_db))
     clip_ratio = float(np.mean(np.abs(audio) >= 0.999))
+    spectral_flatness = librosa.feature.spectral_flatness(y=audio)[0]
+    zcr = librosa.feature.zero_crossing_rate(y=audio)[0]
 
     return {
         "duration_sec": duration_sec,
@@ -36,4 +40,6 @@ def compute_audio_metrics(
         "peak_dbfs": peak_dbfs,
         "silence_ratio": silence_ratio,
         "clip_ratio": clip_ratio,
+        "spectral_flatness_mean": float(np.mean(spectral_flatness)),
+        "zcr_mean": float(np.mean(zcr)),
     }

@@ -2,19 +2,28 @@ from typing import List, Optional, Tuple
 
 from faster_whisper import WhisperModel
 
+try:
+    import torch
+except ImportError:  # pragma: no cover
+    torch = None
+
 
 class WhisperASR:
     def __init__(
         self,
         model_name: str = "medium",
-        device: str = "cpu",
-        compute_type: str = "int8",
+        device: str = "auto",
+        compute_type: str = "auto",
     ) -> None:
+        resolved_device = _resolve_device(device)
+        resolved_compute = _resolve_compute_type(resolved_device, compute_type)
         self.model = WhisperModel(
             model_name,
-            device=device,
-            compute_type=compute_type,
+            device=resolved_device,
+            compute_type=resolved_compute,
         )
+        self.device = resolved_device
+        self.compute_type = resolved_compute
 
     def transcribe(
         self,
@@ -44,3 +53,17 @@ class WhisperASR:
         detected_language = getattr(info, "language", None)
         language_prob = getattr(info, "language_probability", None)
         return results, detected_language, language_prob
+
+
+def _resolve_device(device: str) -> str:
+    if device and device != "auto":
+        return device
+    if torch and torch.cuda.is_available():
+        return "cuda"
+    return "cpu"
+
+
+def _resolve_compute_type(device: str, compute_type: str) -> str:
+    if compute_type and compute_type != "auto":
+        return compute_type
+    return "float16" if device == "cuda" else "int8"
